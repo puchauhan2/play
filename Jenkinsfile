@@ -14,6 +14,9 @@ pipeline {
             steps {
                 // Checkout the code from your version control system
                 checkout scm
+                    sh """
+			aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 975050198487.dkr.ecr.us-east-1.amazonaws.com
+                    """
             }
         }
 
