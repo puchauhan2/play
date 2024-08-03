@@ -14,18 +14,21 @@ pipeline {
             steps {
                 // Checkout the code from your version control system
                 checkout scm
-                    sh """
-			aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 975050198487.dkr.ecr.us-east-1.amazonaws.com
-                    """
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.withRegistry("https://${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com", 'ecr:login') {
-                        def app = docker.build("${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com/${env.ECR_REPOSITORY}:${env.IMAGE_TAG}")
-                    }
+                    sh 'docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG} .'
+                }
+            }
+        }
+
+        stage('Login to Amazon ECR') {
+            steps {
+                script {
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
                 }
             }
         }
@@ -33,10 +36,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry("https://${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com", 'ecr:login') {
-                        def app = docker.image("${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com/${env.ECR_REPOSITORY}:${env.IMAGE_TAG}")
-                        app.push()
-                    }
+                    sh 'docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}'
                 }
             }
         }
@@ -46,8 +46,8 @@ pipeline {
                 script {
                     sh """
                     aws lambda update-function-code \
-                        --function-name ${env.LAMBDA_FUNCTION_NAME} \
-                        --image-uri ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com/${env.ECR_REPOSITORY}:${env.IMAGE_TAG}
+                        --function-name ${LAMBDA_FUNCTION_NAME} \
+                        --image-uri ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
                     """
                 }
             }
