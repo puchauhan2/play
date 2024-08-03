@@ -17,6 +17,15 @@ pipeline {
             }
         }
 
+        stage('Setting file permission') {
+            steps {
+                script {
+                    sh 'chmod +x *.py *.sh'
+                }
+            }
+        }
+
+
         stage('Build Docker Image') {
             steps {
                 script {
