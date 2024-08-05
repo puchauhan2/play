@@ -50,10 +50,7 @@ else
 echo "Conflicts detected. Please resolve conflicts before merging."; 
 git merge --abort; 
 echo "Reverting commit in main branch"    
-git checkout $BASE_BRANCH
-git revert HEAD
-git push origin $BASE_BRANCH
-
+echo "NO action needed"
 fi
 
 echo "Approving pull request and Merging changes"
