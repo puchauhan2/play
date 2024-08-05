@@ -9,7 +9,7 @@ export ACCOUNT_NEW_LINES="$7"
 export GITHUB_API_BASE_URL="$2"
 export ACCOUNT_NAME="$5"
 export ACCOUNT_REQUEST_ID="$4"
-trap "echo error occured" ERR EXIT
+trap "echo  trap says,error occured" ERR EXIT
 
 echo "##################################################################"
 cd /tmp/github_code/
