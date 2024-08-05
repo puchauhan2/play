@@ -56,3 +56,10 @@ fi
 echo "Approving pull request and Merging changes"
 gh pr review $PR_NUMBER --approve
 gh pr merge $PR_NUMBER --merge
+
+if [[ "$?" == "0" ]]
+then 
+echo " Pull request merged"
+else 
+echo "Pull request merge failed"
+fi 
